@@ -1,0 +1,81 @@
+package com.gooagoo.pos.plugin.agent.transformer;
+
+import java.io.OutputStream;
+import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.IllegalClassFormatException;
+import java.security.ProtectionDomain;
+
+import com.gooagoo.javassist.ClassPool;
+import com.gooagoo.javassist.CtClass;
+import com.gooagoo.javassist.CtMethod;
+import com.gooagoo.pos.plugin.agent.transformer.source.SourceCodeFactory;
+import com.gooagoo.pos.plugin.agent.writer.Pencil;
+
+public class JPosTransformer implements ClassFileTransformer {
+
+	static OutputStream out = null;
+
+	@Override
+	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
+			ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+		try {
+			if (className == null) {
+				return null;
+			}
+			className = className.replaceAll("/", ".");
+			Pencil.writeLog("类名为:" + className);
+			for (String useless : Constants.UselessPackagePreix) {
+				if (className.startsWith(useless)) {
+					return null;
+				}
+			}
+			ClassPool pool = ClassPool.getDefault();
+			pool.importPackage("com.gooagoo.pos.plugin.agent.writer.Pencil");
+			pool.importPackage("com.gooagoo.pos.plugin.agent.utils.JSONUtil");
+			pool.importPackage("java.nio.charset.Charset");
+			CtClass cc = pool.get(className);
+			if (!cc.isInterface() && !cc.isEnum() && !cc.isAnnotation()) {
+				CtMethod[] ms = cc.getDeclaredMethods();
+				for (CtMethod m : ms) {
+					boolean skip = false;
+					for (String useless : Constants.UselessPackagePreix) {
+						skip = className.startsWith(useless);
+						if(skip){
+							break;
+						}
+					}
+					if(skip){
+						continue;
+					}
+//					 && m.getName().("com.pos")
+					try {
+						if (!m.isEmpty() && !"main".equals(m.getName())) {
+							if (m.getMethodInfo().getCodeAttribute() != null && m.getMethodInfo().isMethod()) {
+								CtClass[] parameterTypes = m.getParameterTypes();
+								if (parameterTypes != null && parameterTypes.length > 0) {
+									String before = SourceCodeFactory.createBefore(m.getLongName(), parameterTypes);
+									if (before != null && before.length() > 2) {
+										Pencil.writeLog("insert before:"+m.getLongName());
+										try{
+											m.insertBefore(before);
+										}catch(Exception e){ 
+											Pencil.writeLog(e);
+										}
+									}
+								}
+							}
+						}
+					} catch (Exception e) {
+						// TODO LOGGING
+						Pencil.writeLog(e);
+					}
+				}
+			}
+			return cc.toBytecode();
+		} catch (Exception e) {
+			// TODO LOGGING
+			Pencil.writeLog(e);
+		}
+		return null;
+	}
+}

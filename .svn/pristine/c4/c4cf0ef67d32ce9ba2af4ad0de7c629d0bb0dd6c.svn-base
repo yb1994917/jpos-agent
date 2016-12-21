@@ -1,0 +1,28 @@
+package com.gooagoo.pos.plugin.agent.transformer;
+
+public class Constants {
+
+	public static String[] UselessPackagePreix ={ 
+		"java.awt", 
+		"java.beans",
+		"java.applet",
+		"java.io",
+		"java.net",
+		"java.nio",
+		"java.rmi",
+		"java.security",
+		"java.sql",
+		"java.text",
+		"java.util",
+		"com.sun", 
+		"jdk", 
+		"sun", 
+		"com.gooagoo",
+		"org.apache", 
+		"org.springframework", 
+		"org.w3c", 
+		"org.xml", 
+		"org.json",
+		"com.alibaba"
+	};
+}
