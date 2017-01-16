@@ -72,6 +72,37 @@ public class JavaPosAgent {
 			}
 		}
 		
+		if (args.length==1) {
+			List<VirtualMachineDescriptor> vms = VirtualMachine.list();
+
+			for (VirtualMachineDescriptor vm : vms) {
+				try {
+					jvm = VirtualMachine.attach(vm.id());
+					System.out.println(vm.id());
+					try {
+						File agentFile = new File(agent);
+						if (jvm != null) {
+							if (agentFile.exists()) {
+								jvm.loadAgent(agent);
+								jvm.detach();
+							} else {
+								System.out.println("step 4/4. 文件:[" + agent + "]不存在!");
+							}
+						}
+						System.out.println("step 4/4. 加载java代理成功!");
+					} catch (Exception e) {
+						System.out.println("step 4/4. 加载java代理失败!");
+						continue;
+						
+					}
+					
+				} catch (Exception e) {
+					continue;
+				}
+			}
+			return;
+		}
+	
 		
 		if (args.length > 1 && args[1].contains("-")) {
 			String[] split = args[1].split("-");

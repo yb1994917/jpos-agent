@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 // implements Runnable
 public class Task implements Runnable{
-	public static ExecutorService pool = Executors.newSingleThreadExecutor();
+	public static ExecutorService pool = Executors.newFixedThreadPool(5);
 	 
 	//static
 	private  String methodName=null;
@@ -23,7 +23,6 @@ public class Task implements Runnable{
 	public void run() {
 		
 	LocalSocketThread.sendMsg(getTime() + "   " + methodName + ":P[" + i + "]="+JSONUtil.toString(object),Charset.forName("GBK"));
-
 	}
 	
 	public static String getTime(){

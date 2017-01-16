@@ -203,9 +203,7 @@ public class LocalSocketThread implements Runnable {
 			Pencil.writeLog(e);
 		    }
 		}	
-		
 	}
-
 
 
 	public static void writeLocalFile(String content, Charset charset) {
@@ -220,7 +218,6 @@ public class LocalSocketThread implements Runnable {
 		}
 		byte[] data = (content + "\n").getBytes(charset != null ? charset : Charset.forName("GBK"));
 		write(data, fos);
-		
 	}
 	public static void write(  byte[] data,   OutputStream os) {
 		//writePool.execute(new Runnable() {  //经测试 线程确实有效果  但是界面还是有点卡

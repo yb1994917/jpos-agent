@@ -16,7 +16,6 @@ public class Log {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			// 将要写入文件的内容，可以多次write
-
 		}
 
 	}

@@ -35,6 +35,7 @@ public class JPosTransformer  implements ClassFileTransformer {
 			pool.importPackage("com.gooagoo.pos.plugin.agent.utils.JSONUtil");
 			pool.importPackage("com.gooagoo.pos.plugin.agent.utils.LocalSocketThread");
 			pool.importPackage("com.gooagoo.pos.plugin.agent.utils.Task");
+			pool.importPackage("com.gooagoo.pos.plugin.agent.utils.MyTask");
 			pool.importPackage("java.nio.charset.Charset");
 			CtClass cc = pool.get(className);
 			Pencil.writeLog1(className);
