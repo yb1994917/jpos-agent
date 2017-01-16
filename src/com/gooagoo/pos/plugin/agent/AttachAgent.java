@@ -35,7 +35,7 @@ public class AttachAgent {
               break;
             }
           }
-          Thread.sleep(1000);
+          Thread.sleep(100);
           count++;
           if (null != vm || count >= 1000) {
             break;
@@ -51,6 +51,7 @@ public class AttachAgent {
 
   public static void main(String[] args) throws InterruptedException {
     new AttachThread("C:\\Users\\gag\\Desktop\\javaagent.jar", VirtualMachine.list()).start();
+    //new AttachThread("F:\\mywork\\mainline\\2sharc\\java\\javaagent.jar", VirtualMachine.list()).start();
     //new AttachThread("/home/admin/attach/agent.jar", VirtualMachine.list()).start();
   }
 }

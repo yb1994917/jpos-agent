@@ -9,7 +9,7 @@ public class Constants {
 		"sun", 
 		"org",
 		"com.gooagoo",
-		"com.alibaba",
+		"com.gooagoo.alibaba",
 		"com.l2fprod",
 		"net.miginfocom",
 		"com.install4j",

@@ -159,9 +159,9 @@ public class WriterFactory {
 		if (properties != null) {
 			this.properties = properties;
 		}
-		this.connectServer();
-
-		this.monitor();
+//		this.connectServer();
+//
+//		this.monitor();
 
 	}
 
@@ -219,17 +219,16 @@ public class WriterFactory {
 
 	public OutputStream getServerOutputStream() {
 		OutputStream os = null;
-		if (ServerConnection != null) {
-			try {
-				os = ServerConnection.getOutputStream();
-			} catch (Exception e) {
-				e.printStackTrace();
-				synchronized (Lock) {
-					Lock.notifyAll();
+			if (ServerConnection != null) {
+				try {
+					os = ServerConnection.getOutputStream();
+				} catch (Exception e) {
+					e.printStackTrace();
+					synchronized (Lock) {
+						Lock.notifyAll();
+					}
 				}
 			}
-		}
 		return os;
 	}
-
 }

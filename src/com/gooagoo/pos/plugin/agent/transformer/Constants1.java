@@ -7,11 +7,20 @@ public class Constants1 {
 		"jdk", 
 		"sun", 
 		"com.gooagoo",
-		"com.gooagoo", 
 		"org.apache", 
+		"org.eclipse", 
+		"com.gooagoo.alibaba",
 		"org.springframework", 
 		"org.w3c", 
 		"org.xml", 
-		"org.json"
+		"org.json",
+		"java.awt",
+		"com.pos",
+		"int",
+		"byte",
+		"boolean",
+		"double"
+		
+		
 	};
 }

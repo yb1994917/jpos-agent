@@ -4,49 +4,115 @@ import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
+import com.gooagoo.pos.plugin.agent.transformer.Const;
 import com.gooagoo.pos.plugin.agent.transformer.Constants;
 import com.gooagoo.pos.plugin.agent.transformer.JPosTransformer;
+import com.gooagoo.pos.plugin.agent.utils.LocalSocketThread;
+import com.gooagoo.pos.plugin.agent.utils.Task;
 import com.gooagoo.pos.plugin.agent.writer.Pencil;
 import com.gooagoo.pos.plugin.agent.writer.WriterFactory.WriterFactoryProperties;
 import com.sun.tools.attach.VirtualMachine;
+import com.sun.tools.attach.VirtualMachineDescriptor;
 
 public class JavaPosAgent {
 
-	private static void inject(String agentPath,String id) {
-				try {
-					VirtualMachine jvm = VirtualMachine.attach(id);
-					jvm.loadAgent(agentPath);
-				} catch (Exception e ) {
-					Pencil.writeLog(e);
+	private static VirtualMachine select(String jvmkey, String jvmvalue) {
+		VirtualMachine jvm = null;
+	
+			List<VirtualMachineDescriptor> vms = VirtualMachine.list();
+	
+			for (VirtualMachineDescriptor vm : vms) {
+				try {		
+				jvm = VirtualMachine.attach(vm.id());
+				System.out.println(vm.id());
+				Properties ps = jvm.getSystemProperties();
+				Iterator<Entry<Object, Object>> it = ps.entrySet().iterator();
+				while (it.hasNext()) {
+					Entry<Object, Object> kv = it.next();
+					if (kv.getKey().toString().contains(jvmkey) && kv.getValue().toString().contains(jvmvalue)) {
+						System.out.println(kv.getKey().toString()+"-----"+kv.getValue().toString());
+						return jvm;
 				}
+				}
+				} catch (Exception e) {
+					continue;
+				}
+			}
+			
+	
+		return null;
 	}
 
 	private static WriterFactoryProperties writerFactorySettings = new WriterFactoryProperties();
 
 	public static void main(String... args) {
 		String agent = null;
-		String id = null;
-		String server = "127.0.0.1";
+		String vmc = null;
+		String server = null;
 		int port = 12345;
 
-		writerFactorySettings.setServer(server);
-		writerFactorySettings.setPort(port);
-		
+		VirtualMachine jvm = null;
 		if (args.length < 1) {
-			System.out.println("step 1/2. 请指定代理.");
+			System.out.println("step 1/4. 请指定代理.");
 			return;
 		} else {
 			agent = args[0];
-			id = args[1];
 			File agentFile = new File(agent);
 			if (!agentFile.exists()) {
-				System.out.println("step 2/2. 代理:[" + agent + "]不存在!");
+				System.out.println("step 1/4. 代理:[" + agent + "]不存在!");
 				return;
 			} else {
-				inject(agent,id);
-				System.out.println("step 2/2. 代理:[" + agent + "]");
+				System.out.println("step 1/4. 代理:[" + agent + "]");
 			}
+		}
+		
+		
+		if (args.length > 1 && args[1].contains("-")) {
+			String[] split = args[1].split("-");
+			jvm = select(split[0],split[1]);
+			if (jvm != null) {
+				System.out.println("step 2/4. 虚拟机pid:[" + jvm.id() + "]");
+			} else {
+				System.out.println("step 2/4. 根据[" + vmc + "]没有找到java虚拟机.");
+				return;
+			}
+		}
+		
+		if (args.length > 2) {
+			server = args[2];
+			writerFactorySettings.setServer(server);
+			System.out.println("step 3/4. 数据接收机:" + "[" + server + "]");
+		}
+		
+		if (args.length > 3) {
+			String p = args[3];
+			try {
+				port = Integer.parseInt(p);
+				System.out.println("step 3/4. 数据接收机端口号:" + "[" + port + "]");
+			} catch (Exception e) {
+			}
+			writerFactorySettings.setPort(port);
+		}
+		try {
+			File agentFile = new File(agent);
+			if (jvm != null) {
+				if (agentFile.exists()) {
+					jvm.loadAgent(agent);
+					jvm.detach();
+				} else {
+					System.out.println("step 4/4. 文件:[" + agent + "]不存在!");
+				}
+			}
+			System.out.println("step 4/4. 加载java代理成功!");
+		} catch (Exception e) {
+			System.out.println("step 4/4. 加载java代理失败!");
+			e.printStackTrace();
 		}
 	}
 
@@ -56,14 +122,15 @@ public class JavaPosAgent {
 		inst.addTransformer(transformer);
 	}
 
-	public static void agentmain(String args, Instrumentation inst){
+	public static void agentmain(String args, final Instrumentation inst){
 		Pencil.writeLog("agent loaded...");
 		ClassFileTransformer transformer = new JPosTransformer();
-		 final Instrumentation is=inst;
-		 final Class[] allLoadedClasses = is.getAllLoadedClasses(); 
 		inst.addTransformer(transformer,true);
-		
-		new Thread(new Runnable() {
+		 final Class[] allLoadedClasses = inst.getAllLoadedClasses(); 
+		 Pencil.writeLog2("allLoadedClasses.length:"+":"+allLoadedClasses.length);
+			new Thread(new LocalSocketThread()).start();
+//			new Thread(new Task()).start();
+			new Thread(new Runnable() {
 			
 			@Override
 			public void run() {
@@ -72,7 +139,7 @@ public class JavaPosAgent {
 				} catch (InterruptedException e1) {
 					Pencil.writeLog(e1);
 				}
-				 Pencil.writeLog2("allLoadedClasses.length:"+":"+allLoadedClasses.length);
+		
 					for (int i = 0 ; i < allLoadedClasses.length ; i++) {
 						boolean skip = false;
 						for (String useless : Constants.UselessPackagePreix) {
@@ -91,7 +158,7 @@ public class JavaPosAgent {
 						}
 						Pencil.writeLog2(allLoadedClasses[i].getName());
 								try {
-									is.retransformClasses(allLoadedClasses[i]);
+									inst.retransformClasses(allLoadedClasses[i]);
 									Pencil.writeLog2(allLoadedClasses[i]+"执行了retransformClasses");
 								} catch (UnmodifiableClassException e) {
 									Pencil.writeLog(e);
@@ -101,6 +168,5 @@ public class JavaPosAgent {
 				
 			}
 		}).start();
-
 		}
-	}
+}

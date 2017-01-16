@@ -1,35 +1,169 @@
 package com.gooagoo.pos.plugin.agent.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
-import com.alibaba.fastjson.JSON;
-import com.gooagoo.pos.plugin.agent.transformer.Constants;
+import javax.swing.JTable;
+import com.gooagoo.com.alibaba.fastjson.JSON;
+import com.gooagoo.pos.plugin.agent.transformer.Constants1;
+import com.gooagoo.pos.plugin.agent.writer.Pencil;
 
 public class JSONUtil {
 	private static File f = new File("d:/test.txt");
 
-	public static String toString(Object obj) {
+	public static  String toString(Object obj) {
 
 		if (obj == null) {
 			return null;
 		}
-
 		String className = obj.getClass().getName();
-		for (String useless : Constants.UselessPackagePreix) {
+		
+//		if (className.equals("java.lang.String")) {
+//			return "[\"".concat(obj.toString()).concat("\"]");
+//		}
+		try {
+			if (className.equals("javax.swing.JTable")) {
+//				Pencil.writeLog("有Jtable对象 不为null");
+				JTable jt=(JTable)obj;
+				StringBuilder sb = new StringBuilder();
+				if (jt.getRowCount()<= 0 || jt.getColumnCount()<=0) {
+					return "";
+				}
+
+		for (String useless : Constants1.UselessPackagePreix) {
 			if (className.startsWith(useless)) {
 				return "";
 			}
 		}
 		
+		if (jt.getColumnCount()!=12) {
+			return "";
+		}
+		File file = new File(".\\config.ini");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),Charset.forName("GBK")));
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i <  jt.getColumnCount(); i++) {
+			builder.append(jt.getColumnName(i));
+//			Pencil.writeLog(builder.toString());
+		}
+		if (builder.toString().contains(reader.readLine())) {
+			sb.append("{");
+			sb.append("\"detailinfo\":");
+			sb.append("[");
+			for (int i = 0; i < jt.getRowCount(); i++) {
+				sb.append("{");
+				for (int j = 0; j < jt.getColumnCount(); j++) {
+					if (i == jt.getRowCount() - 1
+							&& j == jt.getColumnCount() - 1) {
+						sb.append("\"").append(jt.getColumnName(j))
+								.append("\"").append(": ").append("\"")
+								.append(String.valueOf(jt.getValueAt(i, j)).replace('\n',' ')).append("\"");
+					} else if (i != jt.getRowCount() - 1
+							&& j == jt.getColumnCount() - 1) { //jt.getColumnName(j)取得列名
+						sb.append("\"").append(jt.getColumnName(j))
+								.append("\"").append(": ").append("\"")
+								.append(String.valueOf(jt.getValueAt(i, j)).replace('\n',' ')).append("\"");
+					} else {
+						sb.append("\"").append(jt.getColumnName(j))
+								.append("\"").append(": ").append("\"")
+								.append(String.valueOf(jt.getValueAt(i, j)).replace('\n',' ')).append("\"")
+								.append(",");
+					}
+				}
+				if (i == jt.getRowCount() - 1) {
+					sb.append("}");
+				} else {
+					sb.append("},");
+				}
+			}
+			sb.append("]");
+			sb.append("}");
+		}
+		
+	//	["1","1","阿尔卑斯香橙硬糖150g袋装","袋","1","8.90","0.00","8.90"]
+		
+	//	sb.append("[");
+	//	for (int i = 0; i < jt.getRowCount(); i++) {
+	//		sb.append("{");
+	//		for (int j = 0; j < jt.getColumnCount(); j++) {
+	//			if (i==jt.getRowCount()-1 && j==jt.getColumnCount()-1) {
+	//				sb.append("\"").append(jt.getValueAt(i, j)).append("\"").append("}");
+	//			}else if (i!=jt.getRowCount()-1 && j==jt.getColumnCount()-1) {
+	//				sb.append("\"").append(jt.getValueAt(i, j)).append("\"").append("},");
+	//			}else{
+	//			sb.append("\"").append(jt.getValueAt(i, j)).append("\"").append(",");
+	//			}
+	//		}
+	//	}
+	//	sb.append("]");
+		
+//		sb.append("{");
+//		sb.append("\"detailinfo\":");
+//		sb.append("[");
+//		for (int i = 0; i < jt.getRowCount(); i++) {
+//			sb.append("{");
+//			for (int j = 0; j < jt.getColumnCount(); j++) {
+//				if (i == jt.getRowCount() - 1
+//						&& j == jt.getColumnCount() - 1) {
+//					sb.append("\"").append(i).append(",").append(j)
+//							.append("\"").append(": ").append("\"")
+//							.append(String.valueOf(jt.getValueAt(i, j)).replace('\n',' ')).append("\"");
+//				} else if (i != jt.getRowCount() - 1
+//						&& j == jt.getColumnCount() - 1) {
+//					sb.append("\"").append(i).append(",").append(j)
+//							.append("\"").append(": ").append("\"")
+//							.append(String.valueOf(jt.getValueAt(i, j)).replace('\n',' ')).append("\"");
+//				} else {
+//					sb.append("\"").append(i).append(",").append(j)
+//							.append("\"").append(": ").append("\"")
+//							.append(String.valueOf(jt.getValueAt(i, j)).replace('\n',' ')).append("\"")
+//							.append(",");
+//				}
+//			}
+//			if (i == jt.getRowCount() - 1) {
+//				sb.append("}");
+//			} else {
+//				sb.append("},");
+//			}
+//		}
+//		sb.append("]");
+//		sb.append("}");
+		
+			
+			
+			
+		
+	//	sb.append("{");
+	//	for (int i = 0; i < jt.getRowCount(); i++) {
+	//		sb.append("[");
+	//		for (int j = 0; j < jt.getColumnCount(); j++) {
+	//			if (i==jt.getRowCount()-1 && j==jt.getColumnCount()-1) {
+	//				sb.append("\"").append(i).append(",").append(j).append("\"").append(": ").append("\"").append(jt.getValueAt(i, j)).append("\"");
+	//			}else{
+	//			sb.append("\"").append(i).append(",").append(j).append("\"").append(": ").append("\"").append(jt.getValueAt(i, j)).append("\"").append(",");
+	//			}				
+	//			}
+	//	sb.append("]");
+	//	}
+	//	sb.append("}");
+		return sb.toString();
+	}
+	} catch (Exception e) {
+	Pencil.writeLog(e);
+	return "";
+	}
 		try {
 			String json =  JSON.toJSONString(obj);
-//			write(json);
 			return json;
 		} catch (Exception e) {
-			System.out.println(e.toString());
-			write("JSONUtil" + e.toString());
+			write("发生异常的类" + obj.getClass().getName());
+			Pencil.writeLog(e);
+//			write("JSONUtil" + e.toString());
 			return null;
 		}
 	}
@@ -85,7 +219,6 @@ public class JSONUtil {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-
 	}
 
 }
