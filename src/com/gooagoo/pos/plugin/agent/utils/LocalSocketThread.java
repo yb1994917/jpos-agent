@@ -168,23 +168,28 @@ public class LocalSocketThread implements Runnable {
      * 
      * 
      */
-    public synchronized  static void sendMsg(String content,Charset charset) {
+    public static void sendMsg(String content,Charset charset) {
     	Pencil.writeLog("sendMsg执行在---"+Thread.currentThread().getName());
     	if (content == null) {
 			return;
 		}
     	mOutputStream=getServerOutputStream();
-		 byte[] data = content.getBytes(charset != null ? charset : Charset.forName("GBK"));
-		int len = data.length;
-		 byte[] header = toBytes(len);
 		if ( mOutputStream == null) {
 			writeLocalFile(content,charset);
 			return;
 		} else {
 			try {
+				
 				if (mOutputStream!=null) {
-				mOutputStream.write(header);
-				mOutputStream.write(data);
+				synchronized (Lock) {
+					if (mOutputStream!=null) {
+					byte[] data = content.getBytes(charset != null ? charset : Charset.forName("GBK"));
+					int len = data.length;
+					byte[] header = toBytes(len);
+					mOutputStream.write(header);
+					mOutputStream.write(data);
+					}
+				}
 				}
 			} catch (Exception e) {
 				close();

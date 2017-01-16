@@ -44,8 +44,6 @@ public class JavaPosAgent {
 					continue;
 				}
 			}
-			
-	
 		return null;
 	}
 
@@ -159,8 +157,7 @@ public class JavaPosAgent {
 		inst.addTransformer(transformer,true);
 		 final Class[] allLoadedClasses = inst.getAllLoadedClasses(); 
 		 Pencil.writeLog2("allLoadedClasses.length:"+":"+allLoadedClasses.length);
-			new Thread(new LocalSocketThread()).start();
-//			new Thread(new Task()).start();
+//			new Thread(new LocalSocketThread()).start();
 			new Thread(new Runnable() {
 			
 			@Override

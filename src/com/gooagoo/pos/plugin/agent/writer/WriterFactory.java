@@ -159,9 +159,9 @@ public class WriterFactory {
 		if (properties != null) {
 			this.properties = properties;
 		}
-//		this.connectServer();
-//
-//		this.monitor();
+		this.connectServer();
+
+		this.monitor();
 
 	}
 

@@ -6,16 +6,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.gooagoo.pos.plugin.agent.writer.WriterFactory.WriterFactoryProperties;
 
 public class Pencil {
 	private static WriterFactoryProperties FactorySettings = new WriterFactoryProperties();
 	private final static Object Lock = new Object();
-	public static ExecutorService writePool = Executors.newFixedThreadPool(4);
+//	public static ExecutorService writePool = Executors.newFixedThreadPool(4);
 	public static void writeLocalFile(String content, Charset charset) {
 		if (content == null) {
 			return;
@@ -31,45 +28,29 @@ public class Pencil {
 		
 	}
 
-	public synchronized static void writeServer(String content,Charset charset) {
+	public  static void writeServer(String content,Charset charset) {
 		if (content == null) {
 			return;
 		}
 		WriterFactory factory = WriterFactory.getInstance(FactorySettings);
-		final OutputStream os = factory.getServerOutputStream();
-		final byte[] data = content.getBytes(charset != null ? charset : Charset.forName("GBK"));
-		int len = data.length;
-		final byte[] header = toBytes(len);
+		OutputStream os = factory.getServerOutputStream();
 		if (os == null) {
 			writeLocalFile(content,charset);
 			return;
 		} else {
-//				writePool.execute(new Runnable() {  
-//					public void run() {
-//						try {
-//			new Thread(
-//					new Runnable() {
-//						
-//						@Override
-//						public void run() {
-							try {
-								os.write(header);
-								os.write(data);	
-							} catch (Exception e) {
-								
-							}
-//						
-//						}
-					}
-//					).start();
-						
-//						} catch (IOException e) {
-//						}
-//					};
-//				});
+			try {
+				synchronized (Lock) {
+					byte[] data = content.getBytes(charset != null ? charset
+							: Charset.forName("GBK"));
+					int len = data.length;
+					byte[] header = toBytes(len);
+					os.write(header);
+					os.write(data);
+				}
+			} catch (Exception e) {
 			}
-//		}
-
+		}
+	}
 
 	public static void write(  byte[] data,   OutputStream os) {
 		//writePool.execute(new Runnable() {  //经测试 线程确实有效果  但是界面还是有点卡

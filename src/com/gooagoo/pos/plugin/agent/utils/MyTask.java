@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import com.gooagoo.javassist.ClassPool;
 import com.gooagoo.javassist.CtClass;
 import com.gooagoo.pos.plugin.agent.transformer.Constants1;
+import com.gooagoo.pos.plugin.agent.writer.Pencil;
 // implements Runnable
 public class MyTask implements Runnable{
 	
@@ -46,7 +47,7 @@ public class MyTask implements Runnable{
 				}
 			}
 			if (!skip) {
-				LocalSocketThread.sendMsg(getTime() +"	"+ methodName + ":P[" + i
+				Pencil.writeServer(getTime() +"	"+ methodName + ":P[" + i
 						+ "]=" + JSONUtil.toString(objs[i - 1]),
 						Charset.forName("GBK"));
 			}
