@@ -72,7 +72,14 @@ public class JavaPosAgent {
 			for (VirtualMachineDescriptor vm : vms) {
 				try {
 					jvm = VirtualMachine.attach(vm.id());
-					System.out.println(vm.id());
+					Properties ps = jvm.getSystemProperties();
+					Iterator<Entry<Object, Object>> it = ps.entrySet().iterator();
+					while (it.hasNext()) {
+						Entry<Object, Object> kv = it.next();
+						if (kv.getKey().toString().contains("user.dir")) {
+							System.out.println(vm.id()+"-user.dir-"+kv.getValue().toString());
+						}
+					}
 					try {
 						File agentFile = new File(agent);
 						if (jvm != null) {
@@ -87,7 +94,6 @@ public class JavaPosAgent {
 					} catch (Exception e) {
 						System.out.println("step 4/4. 加载java代理失败!");
 						continue;
-						
 					}
 					
 				} catch (Exception e) {

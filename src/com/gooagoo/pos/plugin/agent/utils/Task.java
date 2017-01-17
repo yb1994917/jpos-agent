@@ -2,12 +2,17 @@ package com.gooagoo.pos.plugin.agent.utils;
 
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 // implements Runnable
 public class Task implements Runnable{
-	public static ExecutorService pool = Executors.newFixedThreadPool(5);
-	 
+	public static BlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>();
+	public static ThreadPoolExecutor pool = new ThreadPoolExecutor(5, 7, 10, TimeUnit.SECONDS,queue);  
+//	 ExecutorService pool = Executors.newFixedThreadPool(8);
 	//static
 	private  String methodName=null;
 	private  Object object =null;
@@ -17,6 +22,7 @@ public class Task implements Runnable{
 		this.methodName=methodName;
 		this.object=object;
 		this.i=i;
+		pool.allowCoreThreadTimeOut(true);
 	}
 	
 	@Override

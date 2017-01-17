@@ -1,6 +1,5 @@
 package com.gooagoo.pos.plugin.agent.transformer;
 
-import java.io.OutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -13,7 +12,6 @@ import com.gooagoo.pos.plugin.agent.writer.Pencil;
 
 public class JPosTransformer  implements ClassFileTransformer {
 
-	static OutputStream out = null;
 
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
@@ -40,7 +38,7 @@ public class JPosTransformer  implements ClassFileTransformer {
 			CtClass cc = pool.get(className);
 			Pencil.writeLog1(className);
 			if (!cc.isInterface() && !cc.isEnum() && !cc.isAnnotation()) {
-				synchronized (cc) {
+			synchronized (cc) {
 			CtMethod[] ms = cc.getDeclaredMethods();
 				for (CtMethod m : ms) {
 					if (!m.isEmpty() && !"main".equals(m.getName())) {
@@ -48,7 +46,7 @@ public class JPosTransformer  implements ClassFileTransformer {
 							CtClass[] parameterTypes = m.getParameterTypes();
 							if (parameterTypes != null && parameterTypes.length > 0) {
 								String before = SourceCodeFactory.createBefore(m.getLongName(), parameterTypes);
-									Pencil.writeLog("insert before:"+m.getLongName());
+								Pencil.writeLog("insert before:"+m.getLongName());
 									try{
 										m.insertBefore(before);
 									}catch(Exception e){ 

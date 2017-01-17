@@ -28,8 +28,6 @@ public class AttachAgent {
             System.out.println("displayName:" + vmd.displayName());
             System.out.println("toString:" + vmd.toString());
             
-            
-            
             if (!listBefore.contains(vmd)) {
               vm = VirtualMachine.attach(vmd);
               break;

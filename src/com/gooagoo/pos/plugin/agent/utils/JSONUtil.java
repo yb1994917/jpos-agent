@@ -34,15 +34,13 @@ public class JSONUtil {
 				if (jt.getRowCount()<= 0 || jt.getColumnCount()<=0) {
 					return "";
 				}
-
+			if (jt.getColumnCount()!=12) {
+				return "";
+			}
 		for (String useless : Constants1.UselessPackagePreix) {
 			if (className.startsWith(useless)) {
 				return "";
 			}
-		}
-		
-		if (jt.getColumnCount()!=12) {
-			return "";
 		}
 		File file = new File(".\\config.ini");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),Charset.forName("GBK")));

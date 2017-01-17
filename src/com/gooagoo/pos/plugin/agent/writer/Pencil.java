@@ -29,6 +29,7 @@ public class Pencil {
 	}
 
 	public  static void writeServer(String content,Charset charset) {
+//		Pencil.writeLog("writeServer执行在"+Thread.currentThread().getName());
 		if (content == null) {
 			return;
 		}

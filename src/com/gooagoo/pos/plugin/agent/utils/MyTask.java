@@ -56,8 +56,6 @@ public class MyTask implements Runnable{
 						Charset.forName("GBK"));
 			}
 		}
-		
-		
 		}
 		public static String getTime(){
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
