@@ -83,6 +83,10 @@ public class JSONUtil {
 			}
 			sb.append("]");
 			sb.append("}");
+			return sb.toString();
+		}else{
+//			Pencil.writeLog1("column顺序错误!!");
+			return "column顺序错误!!";
 		}
 		
 	//	["1","1","阿尔卑斯香橙硬糖150g袋装","袋","1","8.90","0.00","8.90"]
@@ -151,7 +155,6 @@ public class JSONUtil {
 	//	sb.append("]");
 	//	}
 	//	sb.append("}");
-		return sb.toString();
 	}
 	} catch (Exception e) {
 	Pencil.writeLog(e);

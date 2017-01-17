@@ -39,8 +39,12 @@ public class MyTask implements Runnable{
 		cup.append("{\n").append("	   try{\n");
 		for (int i = 1; i <= len; i++) {
 			Object obj = objs[i - 1];
+			if (obj==null) {
+				continue;
+			}
 			boolean skip = false;
 			for (String useless : Constants1.UselessPackagePreix) {
+				
 				if (obj.getClass().getName().startsWith(useless)) {
 					skip = true;
 					break;

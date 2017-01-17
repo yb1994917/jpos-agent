@@ -8,13 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
-import com.gooagoo.pos.plugin.agent.transformer.Const;
 import com.gooagoo.pos.plugin.agent.transformer.Constants;
 import com.gooagoo.pos.plugin.agent.transformer.JPosTransformer;
-import com.gooagoo.pos.plugin.agent.utils.LocalSocketThread;
-import com.gooagoo.pos.plugin.agent.utils.Task;
 import com.gooagoo.pos.plugin.agent.writer.Pencil;
 import com.gooagoo.pos.plugin.agent.writer.WriterFactory.WriterFactoryProperties;
 import com.sun.tools.attach.VirtualMachine;
@@ -157,7 +153,7 @@ public class JavaPosAgent {
 		inst.addTransformer(transformer,true);
 		 final Class[] allLoadedClasses = inst.getAllLoadedClasses(); 
 		 Pencil.writeLog2("allLoadedClasses.length:"+":"+allLoadedClasses.length);
-//			new Thread(new LocalSocketThread()).start();
+		 //new Thread(new LocalSocketThread()).start();
 			new Thread(new Runnable() {
 			
 			@Override
@@ -193,7 +189,6 @@ public class JavaPosAgent {
 									continue;
 								}
 					}
-				
 			}
 		}).start();
 		}

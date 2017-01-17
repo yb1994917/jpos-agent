@@ -87,6 +87,9 @@ public class JSON {
 					}
 					sb.append("]");
 					sb.append("}");
+				}else{
+					Pencil.writeLog("column顺序错误!!");
+					return "";
 				}
 //				sb.append("[");
 //				for (int i = 0; i < jt.getRowCount(); i++) {

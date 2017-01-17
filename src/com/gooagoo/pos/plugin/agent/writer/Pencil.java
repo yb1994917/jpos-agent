@@ -44,8 +44,10 @@ public class Pencil {
 							: Charset.forName("GBK"));
 					int len = data.length;
 					byte[] header = toBytes(len);
-					os.write(header);
-					os.write(data);
+					if (os!=null) {
+						os.write(header);
+						os.write(data);
+					}
 				}
 			} catch (Exception e) {
 			}
