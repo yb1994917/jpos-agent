@@ -13,9 +13,7 @@ public class Log {
 			pw.write(content);
 			pw.close();// 关闭流
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 }

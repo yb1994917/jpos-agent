@@ -17,7 +17,7 @@ public class Pencil {
 		if (content == null) {
 			return;
 		}
-	
+
 		WriterFactory factory = WriterFactory.getInstance(FactorySettings);
 		final OutputStream fos = factory.getFileOutputStream();
 		if(fos==null){

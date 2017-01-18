@@ -23,7 +23,7 @@ public class WriterFactory {
 	private WriterFactoryProperties properties = new WriterFactoryProperties();
 	private static Socket ServerConnection = null;
 	private static final Object Lock = new Object();
-
+	
 	/**
 	 * 工厂属性
 	 * 
@@ -104,7 +104,7 @@ public class WriterFactory {
 						try {
 							Lock.wait();
 						} catch (InterruptedException ex) {
-
+								
 						}
 					}
 				} catch (Exception e) {
@@ -116,6 +116,7 @@ public class WriterFactory {
 						}
 						try {
 							Lock.wait(2000);
+							continue;
 						} catch (InterruptedException ex) {
 						}
 					}
@@ -223,7 +224,7 @@ public class WriterFactory {
 				try {
 					os = ServerConnection.getOutputStream();
 				} catch (Exception e) {
-					e.printStackTrace();
+//					e.printStackTrace(); error.log
 					synchronized (Lock) {
 						Lock.notifyAll();
 					}
